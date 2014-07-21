@@ -28,6 +28,11 @@ class magento::params {
   ]
   $download_directory = '/var/cache/magento/download'
 
+  # default settings for magento
+  $locale = 'en_US'
+  $timezone = 'UTC'
+  $currency = 'USD'
+
   case $::operatingsystem {
     'Fedora', 'CentOS', 'RedHat': {
       $document_root = '/var/www/html'

@@ -26,4 +26,9 @@ class magento::install {
     ensure => directory
   }
 
+  # for magento's php loading to work
+  package { 'php-mysql':
+    ensure => installed
+  }
+
 }

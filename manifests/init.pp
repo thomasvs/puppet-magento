@@ -19,6 +19,22 @@
 #
 # == Author
 #
-class magento {
-
+define magento (
+  $version = $title,
+  $db_pass,
+  $admin_firstname,
+  $admin_lastname,
+  $admin_email,
+  $admin_username = 'admin',
+  $admin_password,
+) {
+  magento::install::tarball { $version: }
+  magento::config { $version:
+    db_pass         => $db_pass,
+    admin_firstname => $admin_firstname,
+    admin_lastname  => $admin_lastname,
+    admin_email     => $admin_email,
+    admin_username  => $admin_username,
+    admin_password  => $admin_password,
+  }
 }

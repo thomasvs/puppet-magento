@@ -31,6 +31,7 @@ define magento::config (
   $admin_email,
   $admin_username = 'admin',
   $admin_password,
+  $web_method = 'apache',
 ) {
 
   include php::cli
@@ -97,5 +98,14 @@ define magento::config (
 #  database_grant { "${real_db_user}@${db_host}/${real_db_name}":
 #    privileges => [ 'all' ]
 #  }
+
+  if ($web_method == 'apache') {
+    # deploy container for magento
+    apache_httpd::file { "container-magento-${version}.inc":
+      ensure  => file,
+      content => template('magento/apache/container/magento.inc.erb'),
+    }
+
+  }
 }
 

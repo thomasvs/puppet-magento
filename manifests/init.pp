@@ -6,6 +6,9 @@
 # == Requirements:
 #
 # - This module requires
+#   - the puppetlabs mysql module
+#   - the thias php module
+#   - php::ini call for /etc/php.ini
 #
 # == Parameters
 #
@@ -14,6 +17,9 @@
 #   Default: present
 #
 # == Variables
+#
+#   [* admin_password *]
+#     must contain letters and numbers and be at least 7 characters long
 #
 # == Examples
 #

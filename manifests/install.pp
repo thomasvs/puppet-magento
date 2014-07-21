@@ -27,7 +27,9 @@ class magento::install {
   }
 
   # for magento's php loading to work
-  package { 'php-mysql':
+  package { [
+    'php-mysql',
+    ]:
     ensure => installed
   }
 

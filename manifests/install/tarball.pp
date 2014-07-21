@@ -33,25 +33,49 @@ define magento::install::tarball (
   $assets_url = 'http://www.magentocommerce.com/downloads/assets'
   $targz = "magento-${version}.tar.gz"
 
-  exec { "download-magento-${version}":
+  exec { "magento-download-${version}":
     cwd     => $magento::params::download_directory,
     command => "/usr/bin/wget ${assets_url}/${version}/${targz}",
     creates => "${magento::params::download_directory}/${targz}",
   }
 
-  exec { "untar-magento-${version}":
+  exec { "magento-untar-${version}":
     cwd     => $magento::params::document_root,
-    command => "/bin/tar xvzf /tmp/${targz}",
+    command => "/bin/tar xvzf ${magento::params::download_directory}/${targz}; mv magento magento-${version}; chown -R root:root magento-${version}",
     require => [
-      Exec["download-magento-${version}"],
+      Exec["magento-download-${version}"],
     ],
     creates => $magento_dir,
   }
 
-  exec { "setting-permissions-${version}":
+  exec { "magento-permissions-${version}":
     cwd     => $magento_dir,
-    command => "/bin/chmod 550 mage; /bin/chmod o+w var var/.htaccess app/etc; /bin/chmod -R o+w media",
-    require => Exec["untar-magento-${version}"],
+    command => '/bin/chmod -R o+w media',
+    require => Exec["magento-untar-${version}"],
+    unless  => '/bin/bash -c "test `stat -c %a media` -eq 777"'
   }
 
+  file { "${magento_dir}/mage":
+    ensure  => present,
+    mode    => '0550',
+    require => Exec["magento-untar-${version}"],
+  }
+
+  file { "${magento_dir}/var/.htaccess":
+    ensure  => present,
+    mode    => '0666',
+    require => Exec["magento-untar-${version}"],
+  }
+
+
+  # FIXME: can we tighten these?
+  file { [
+    "${magento_dir}/var",
+    "${magento_dir}/app/etc",
+    "${magento_dir}/app/media",
+    ]:
+    ensure  => directory,
+    mode    => '0777',
+    require => Exec["magento-untar-${version}"],
+  }
 }

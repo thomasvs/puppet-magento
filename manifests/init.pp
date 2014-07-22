@@ -27,6 +27,7 @@
 #
 define magento (
   $version = $title,
+  $url,
   $db_pass,
   $admin_firstname,
   $admin_lastname,
@@ -36,6 +37,7 @@ define magento (
 ) {
   magento::install::tarball { $version: }
   magento::config { $version:
+    url             => $url,
     db_pass         => $db_pass,
     admin_firstname => $admin_firstname,
     admin_lastname  => $admin_lastname,

@@ -1,7 +1,6 @@
-# = Class: magento
+# = Define: magento
 #
-# This class does stuff that you describe here.
-# Change Class to Define if needed.
+# This define deploys one instance of magento.
 #
 # == Requirements:
 #
@@ -35,7 +34,9 @@ define magento (
   $admin_username = 'admin',
   $admin_password,
 ) {
+  # FIXME: make install configurable
   magento::install::tarball { $version: }
+
   magento::config { $version:
     url             => $url,
     db_pass         => $db_pass,

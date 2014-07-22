@@ -26,10 +26,11 @@ class magento::install {
     ensure => directory
   }
 
-  # for magento's php loading to work
+  # for magento's php installation script
   package { [
     'php-mysql',
-    ]:
+    'php-mcrypt',
+  ]:
     ensure => installed
   }
 

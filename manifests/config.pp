@@ -28,7 +28,7 @@ define magento::config (
   $db_name = undef,
   $db_user = undef,
   $db_pass,
-  $url = "magento-${version}",
+  $url = undef,
   $admin_firstname,
   $admin_lastname,
   $admin_email,
@@ -36,6 +36,13 @@ define magento::config (
   $admin_password,
   $web_method = 'apache',
 ) {
+
+  if (!$url) {
+    $real_url = inline_template(
+      "<%= 'magento-' + @version.gsub('.', '_') + '.localdomain' %>")
+  } else {
+    $real_url = $url
+  }
 
   include php::cli
   include mysql::server
@@ -71,10 +78,10 @@ define magento::config (
     --db_name '${real_db_name}' \
     --db_user '${real_db_user}' \
     --db_pass '${db_pass}' \
-    --url '${url}' \
+    --url '${real_url}' \
     --use_rewrites 'yes' \
     --use_secure 'no' \
-    --secure_base_url '${url}' \
+    --secure_base_url '${real_url}' \
     --use_secure_admin 'no' \
     --skip_url_validation 'yes' \
     --admin_firstname '${admin_firstname}' \

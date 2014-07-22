@@ -12,6 +12,9 @@
 # [* ensure *]
 #   What state to ensure for the module.
 #   Default: present
+# [* web_method *]
+#   If set to apache, generates container-magento-${version}.inc files
+#   under the apache config directory to be included by configuration
 #
 # == Variables
 #

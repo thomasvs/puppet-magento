@@ -25,8 +25,9 @@
 # == Author
 #
 define magento (
-  $version = $title,
+  $version = undef,
   $url,
+  $db_name,
   $db_pass,
   $admin_firstname,
   $admin_lastname,
@@ -35,10 +36,14 @@ define magento (
   $admin_password,
 ) {
   # FIXME: make install configurable
-  magento::install::tarball { $version: }
+  magento::install::tarball { $title:
+    version => $version
+  }
 
-  magento::config { $version:
+  magento::config { $title:
+    version         => $version,
     url             => $url,
+    db_name         => $db_name,
     db_pass         => $db_pass,
     admin_firstname => $admin_firstname,
     admin_lastname  => $admin_lastname,

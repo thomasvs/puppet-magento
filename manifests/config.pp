@@ -23,7 +23,7 @@
 # == Author
 #
 define magento::config (
-  $version = $title,
+  $version = undef,
   $db_host = 'localhost',
   $db_name = undef,
   $db_user = undef,
@@ -37,12 +37,34 @@ define magento::config (
   $web_method = 'apache',
 ) {
 
+  # handle input variables
   if (!$url) {
     $real_url = inline_template(
       "<%= 'magento-' + @version.gsub('.', '_') + '.localdomain' %>")
   } else {
     $real_url = $url
   }
+
+  if ($version) {
+    $real_version = $version
+    $real_title = $title
+  } else {
+    $real_version = $title
+    $real_title = "magento-${title}"
+  }
+
+  if ($db_name) {
+    $real_db_name = $db_name
+  } else {
+    $real_db_name = $real_title
+  }
+  # mysql::db cannot deal with the same user being reused
+  if ($db_user) {
+    $real_db_user = $db_user
+  } else {
+    $real_db_user = $real_title
+  }
+
 
   include php::cli
   include mysql::server
@@ -51,22 +73,10 @@ define magento::config (
 
 
 
-  if ($db_name) {
-    $real_db_name = $db_name
-  } else {
-    $real_db_name = "magento-${version}"
-  }
-  # mysql::db cannot deal with the same user being reused
-  if ($db_user) {
-    $real_db_user = $db_user
-  } else {
-    $real_db_user = "magento-${version}"
-  }
 
+  $magento_dir = "${magento::params::document_root}/${real_title}"
 
-  $magento_dir = "${magento::params::document_root}/magento-${version}"
-
-  exec { "install-magento-${version}":
+  exec { "magento-install-${real_title}":
     cwd     => $magento_dir,
     creates => "${magento_dir}/app/etc/local.xml",
     command => "/usr/bin/php -f install.php -- \
@@ -91,7 +101,7 @@ define magento::config (
     --admin_password '${admin_password}' \
     ",
     require => [
-      Magento::Install::Tarball[$version],
+      Magento::Install::Tarball[$title],
       Mysql::Db[$real_db_name],
 #      Exec["create-magentodb-db"],
       Class['php::cli'],
@@ -111,7 +121,7 @@ define magento::config (
 
   if ($web_method == 'apache') {
     # deploy container for magento
-    apache_httpd::file { "container-magento-${version}.inc":
+    apache_httpd::file { "container-${real_title}.inc":
       ensure  => file,
       content => template('magento/apache/container/magento.inc.erb'),
     }

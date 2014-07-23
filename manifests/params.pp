@@ -35,10 +35,10 @@ class magento::params {
 
   case $::operatingsystem {
     'Fedora', 'CentOS', 'RedHat': {
-      $document_root = '/var/www/html'
+      $document_root = '/var/www'
     }
     default: {
-      $document_root = '/var/www/html'
+      $document_root = '/var/www'
     }
   }
 }

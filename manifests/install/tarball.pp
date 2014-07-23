@@ -61,7 +61,7 @@ define magento::install::tarball (
 
   exec { "magento-permissions-${dirname}":
     cwd     => $magento_dir,
-    command => '/bin/chmod -R o+w media',
+    command => '/bin/chmod -R go+w media',
     require => Exec["magento-untar-${real_version}-to-${dirname}"],
     unless  => '/bin/bash -c "test `stat -c %a media` -eq 777"'
   }

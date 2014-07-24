@@ -46,13 +46,14 @@ define magento::install::tarball (
 
   exec { "magento-download-${real_version}-for-${dirname}":
     cwd     => $magento::params::download_directory,
+    user    => 'www',
     command => "/usr/bin/wget ${assets_url}/${real_version}/${targz}",
     creates => "${magento::params::download_directory}/${targz}",
   }
 
   exec { "magento-untar-${real_version}-to-${dirname}":
     cwd     => $magento::params::document_root,
-    command => "/bin/tar xvzf ${magento::params::download_directory}/${targz}; mv magento ${dirname}; chown -R root:root ${dirname}",
+    command => "/bin/tar xvzf ${magento::params::download_directory}/${targz}; mv magento ${dirname}; chown -R www:root ${dirname}",
     require => [
       Exec["magento-download-${real_version}-for-${dirname}"],
     ],
@@ -79,6 +80,14 @@ define magento::install::tarball (
   }
 
 
+  file { [
+    $magento_dir,
+    ]:
+    ensure  => directory,
+    owner   => 'www',
+    require => Exec["magento-untar-${real_version}-to-${dirname}"],
+  }
+
   # FIXME: can we tighten these?
   file { [
     "${magento_dir}/var",
@@ -87,6 +96,9 @@ define magento::install::tarball (
     ]:
     ensure  => directory,
     mode    => '0777',
-    require => Exec["magento-untar-${real_version}-to-${dirname}"],
+    require => [
+      File[$magento_dir],
+      Exec["magento-untar-${real_version}-to-${dirname}"],
+    ]
   }
 }

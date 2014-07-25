@@ -8,6 +8,7 @@
 #   - the puppetlabs mysql module
 #   - the thias php module
 #   - php::ini call for /etc/php.ini
+#   - /usr/bin/wget for downloading tarballs
 #
 # == Parameters
 #

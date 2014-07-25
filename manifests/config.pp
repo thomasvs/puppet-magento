@@ -100,6 +100,8 @@ define magento::config (
     --admin_username '${admin_username}' \
     --admin_password '${admin_password}' \
     ",
+    # this can take a while, so it timed out on my host with 300
+    timeout => 1800,
     require => [
       Magento::Install::Tarball[$title],
       Mysql::Db[$real_db_name],

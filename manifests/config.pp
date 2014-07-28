@@ -110,6 +110,13 @@ define magento::config (
     ],
   }
 
+  # FIXME: find a way to not run this on every puppet run
+  # exec { "magento-indexer-${real_title}":
+  #   cwd     => $magento_dir,
+  #   command => "/usr/bin/php -f shell/indexer.php reindexall",
+  #   subscribe => Exec["magento-install-${real_title}"]
+  #  }
+
   mysql::db { $real_db_name:
     user     => $real_db_user,
     password => $db_pass,

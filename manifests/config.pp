@@ -40,7 +40,7 @@ define magento::config (
   # handle input variables
   if (!$url) {
     $real_url = inline_template(
-      '<%= "magento-" + @version.gsub(".", "_") + ".localdomain" %>')
+      '<%= "magento-" + @version.gsub(".", "-") + ".localdomain" %>')
   } else {
     $real_url = $url
   }

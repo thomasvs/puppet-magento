@@ -30,6 +30,9 @@ class magento::install {
   package { [
     'php-mysql',
     'php-mcrypt',
+    # without this, magento 500's on generating the src tag for the first
+    # image on the product page
+    'php-gd',
   ]:
     ensure => installed
   }

@@ -1,6 +1,7 @@
 # = Define: magento::modman::deploy
 #
 # This define deploys a magento module using modman.
+# Currently this only supports deploying from a git repository.
 #
 # == Requirements:
 #
@@ -22,6 +23,7 @@ define magento::modman::deploy (
   $magento_root,
   $module_name,
   $module_git_url,
+  $module_git_commit = 'origin/master',
 ) {
 
   exec { "modman-deploy-init-${magento_root}-${module_name}":
@@ -39,6 +41,19 @@ define magento::modman::deploy (
     creates => "${magento_root}/.modman/${module_name}",
     require => [
       Exec["modman-deploy-init-${magento_root}-${module_name}"]
+    ]
+  }
+
+  git::checkout { "modman-deploy-git-checkout-${magento_root}-${module_name}":
+    directory        => "${magento_root}/.modman",
+    checkoutdir      => $module_name,
+    repository       => $module_git_url,
+    commit           => $module_git_commit,
+    commit_file      => "${module_name}.commit",
+    user             => 'www',
+    #    manage_directory => false,
+    require          => [
+      Exec["modman-deploy-clone-${magento_root}-${module_name}"]
     ]
   }
 

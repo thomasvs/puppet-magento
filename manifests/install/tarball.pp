@@ -46,7 +46,6 @@ define magento::install::tarball (
 
   exec { "magento-download-${real_version}-for-${dirname}":
     cwd     => $magento::params::download_directory,
-    user    => 'www',
     command => "/usr/bin/wget ${assets_url}/${real_version}/${targz}",
     creates => "${magento::params::download_directory}/${targz}",
   }
@@ -96,6 +95,24 @@ define magento::install::tarball (
     ]:
     ensure  => directory,
     mode    => '0777',
+    require => [
+      File[$magento_dir],
+      Exec["magento-untar-${real_version}-to-${dirname}"],
+    ]
+  }
+
+  # indexer locks are saved in var/locks and should be apache-owned so apache
+  # can manage them
+  # avoids
+  # Stock Status Index process is working now. Please try run this process
+  # later.
+  file { [
+    "${magento_dir}/var/locks",
+    ]:
+    ensure  => directory,
+    mode    => '0777',
+    owner   => 'apache',
+    group   => 'apache',
     require => [
       File[$magento_dir],
       Exec["magento-untar-${real_version}-to-${dirname}"],

@@ -50,9 +50,12 @@ define magento::install::tarball (
     creates => "${magento::params::download_directory}/${targz}",
   }
 
+  # we do this in download dir instead of document root because the
+  # tarball unpacks under magento/ and we don't want it to overwrite
+  # pre-untarred magento/ dir
   exec { "magento-untar-${real_version}-to-${dirname}":
-    cwd     => $magento::params::document_root,
-    command => "/bin/tar xvzf ${magento::params::download_directory}/${targz}; mv magento ${dirname}; chown -R www:root ${dirname}",
+    cwd     => $magento::params::download_directory,
+    command => "/bin/tar xvzf ${magento::params::download_directory}/${targz}; mv magento ${magento_dir}; chown -R www:root ${magento_dir}",
     require => [
       Exec["magento-download-${real_version}-for-${dirname}"],
     ],
@@ -114,7 +117,7 @@ define magento::install::tarball (
     owner   => 'apache',
     group   => 'apache',
     require => [
-      File[$magento_dir],
+      File["${magento_dir}/var"],
       Exec["magento-untar-${real_version}-to-${dirname}"],
     ]
   }

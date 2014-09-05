@@ -50,12 +50,13 @@ define magento::install::tarball (
     creates => "${magento::params::download_directory}/${targz}",
   }
 
-  # we do this in download dir instead of document root because the
-  # tarball unpacks under magento/ and we don't want it to overwrite
-  # pre-untarred magento/ dir
+  # we do this in the final directory so that selinux context gets set
+  # correctly
+  # we tell tar to unpack to the final dir, because magento tarballs by
+  # default unpack to magento/ which could be the name of one of our installs
   exec { "magento-untar-${real_version}-to-${dirname}":
-    cwd     => $magento::params::download_directory,
-    command => "/bin/tar xvzf ${magento::params::download_directory}/${targz}; mv magento ${magento_dir}; chown -R www:root ${magento_dir}",
+    cwd     => $magento::params::document_root,
+    command => "/bin/tar xzf ${magento::params::download_directory}/${targz} --transform 's@magento@${dirname}@'; chown -R www:root ${magento_dir}",
     require => [
       Exec["magento-download-${real_version}-for-${dirname}"],
     ],

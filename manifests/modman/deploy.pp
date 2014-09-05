@@ -57,12 +57,22 @@ define magento::modman::deploy (
     ]
   }
 
+  file { "${magento_root}/.modman/${module_name}.commit":
+    # audit makes puppet track the md5sum and hence it can
+    # act on changes over runs
+    audit => content,
+  }
+
   exec { "modman-deploy-deploy-${magento_root}-${module_name}":
-    cwd     => $magento_root,
-    user    => 'www',
-    command => "/usr/local/bin/modman deploy ${module_name}",
-    require => [
+    cwd         => $magento_root,
+    user        => 'www',
+    command     => "/usr/local/bin/modman deploy ${module_name}",
+    refreshonly => true,
+    require     => [
       Exec["modman-deploy-clone-${magento_root}-${module_name}"]
+    ],
+    subscribe   => [
+      File["${magento_root}/.modman/${module_name}.commit"],
     ]
   }
 
